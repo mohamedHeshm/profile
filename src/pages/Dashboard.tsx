@@ -7,10 +7,11 @@ import { ENTITIES } from '../features/dashboard/entities'
 import Overview from '../features/dashboard/Overview'
 import ProfileForm from '../features/dashboard/ProfileForm'
 import ProjectsManager from '../features/dashboard/ProjectsManager'
+import MessagesList from '../features/dashboard/MessagesList'
 import SettingsForm from '../features/dashboard/SettingsForm'
 
-const TABS = ['Overview', 'Profile', 'Skills', 'Projects', 'Experience', 'Education', 'Services', 'Links', 'Settings'] as const
-const DESC: Record<string, string> = { Overview: 'A snapshot of your portfolio.', Profile: 'How visitors first meet you.', Skills: 'The technologies you work with, grouped by category.', Projects: 'Your case studies: the centerpiece of the portfolio.', Experience: 'Roles and responsibilities, newest first.', Education: 'Degrees and relevant study.', Services: 'What you offer clients.', Links: 'GitHub, LinkedIn and other places to reach you.', Settings: 'Title, color, logo and section order.' }
+const TABS = ['Overview', 'Profile', 'Skills', 'Projects', 'Experience', 'Education', 'Services', 'Links', 'Messages', 'Settings'] as const
+const DESC: Record<string, string> = { Overview: 'A snapshot of your portfolio.', Profile: 'How visitors first meet you.', Skills: 'The technologies you work with, grouped by category.', Projects: 'Your case studies: the centerpiece of the portfolio.', Experience: 'Roles and responsibilities, newest first.', Education: 'Degrees and relevant study.', Services: 'What you offer clients.', Links: 'GitHub, LinkedIn and other places to reach you.', Messages: 'Messages sent from your contact form.', Settings: 'Title, color, logo and section order.' }
 type Tab = (typeof TABS)[number]
 
 export default function Dashboard() {
@@ -48,6 +49,7 @@ export default function Dashboard() {
         {tab === 'Overview' && <Overview uid={uid} go={choose} />}
         {tab === 'Profile' && <ProfileForm uid={uid} email={session.user.email ?? ''} />}
         {tab === 'Projects' && <ProjectsManager uid={uid} />}
+        {tab === 'Messages' && <MessagesList />}
         {tab === 'Settings' && <SettingsForm uid={uid} />}
         {ENTITIES[tab] && <EntityManager key={tab} uid={uid} config={ENTITIES[tab]} />}
       </main>

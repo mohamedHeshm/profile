@@ -10,7 +10,8 @@ import { SECTIONS, sectionCss } from '../lib/sections'
 import { supabase } from '../lib/supabase'
 import type { Education, Experience, Service, Skill, SocialLink } from '../types'
 import Hero from './home/Hero'
-import { About, Contact, Services, Stack, Timeline } from './home/Sections'
+import Contact from './home/Contact'
+import { About, Services, Stack, Timeline } from './home/Sections'
 import Work, { CARD_COLS, type ProjectCard } from './home/Work'
 
 export default function Home() {
@@ -53,7 +54,7 @@ export default function Home() {
           <section className="empty"><h1>This portfolio is not set up yet</h1><p>Sign in and complete your profile to publish it.</p><Link className="btn primary" to="/login">Sign in</Link></section>
         ) : (
           <>
-            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} skills={skills} />
+            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} />
             <div className="sections">
               {projects.length > 0 && <Work projects={projects} />}
               {skills.length > 0 && <Stack skills={skills} />}
@@ -61,12 +62,12 @@ export default function Home() {
               {jobs.length > 0 && <Timeline id="experience" kicker="Experience" title="Where I’ve worked" entries={jobs.map((j) => ({ key: j.id, period: range(j.start_date, j.end_date, j.current), title: j.position, sub: [j.company, j.location].filter(Boolean).join(' · '), text: j.description }))} />}
               {edu.length > 0 && <Timeline id="education" kicker="Education" title="Education" entries={edu.map((e) => ({ key: e.id, period: range(e.start_date, e.end_date), title: e.institution, sub: [e.degree, e.field].filter(Boolean).join(', '), text: e.description }))} />}
               {services.length > 0 && <Services services={services} />}
-              <Contact email={profile.email} links={links} resume={profile.resume_url} />
+              <Contact email={profile.email} phone={profile.phone} links={links} />
             </div>
           </>
         )}
       </main>
-      {profile && <footer className="foot">© {new Date().getFullYear()} {profile.full_name}</footer>}
+      {profile && <footer className="foot"><strong>{profile.full_name}</strong> · {profile.job_title}<span> © {new Date().getFullYear()}</span></footer>}
     </>
   )
 }

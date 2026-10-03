@@ -5,7 +5,7 @@ import { uploadImage } from '../../lib/upload'
 import type { Profile } from '../../types'
 
 type Draft = Omit<Profile, 'id'>
-const blank = (email: string): Draft => ({ full_name: '', username: null, job_title: '', short_bio: '', full_bio: '', location: '', email, avatar_url: null, resume_url: null, years_experience: null, available: true })
+const blank = (email: string): Draft => ({ full_name: '', username: null, job_title: '', short_bio: '', full_bio: '', location: '', email, avatar_url: null, resume_url: null, phone: '', years_experience: null, available: true })
 
 export default function ProfileForm({ uid, email }: { uid: string; email: string }) {
   const { profile, loading, reload } = useProfile(uid)
@@ -45,6 +45,7 @@ export default function ProfileForm({ uid, email }: { uid: string; email: string
       <label>Full bio<textarea rows={6} maxLength={2000} value={d.full_bio} onChange={(e) => set('full_bio', e.target.value)} /></label>
       <label>Location<input value={d.location} onChange={(e) => set('location', e.target.value)} maxLength={80} /></label>
       <label>Public email<input type="email" value={d.email} onChange={(e) => set('email', e.target.value)} /></label>
+      <label>Phone<input type="tel" maxLength={30} pattern="[+0-9 ()\-]*" value={d.phone} onChange={(e) => set('phone', e.target.value)} /></label>
       <label>Resume link (URL to your CV)<input type="url" value={d.resume_url ?? ''} onChange={(e) => set('resume_url', e.target.value || null)} /></label>
       <label>Years of experience<input type="number" min={0} max={60} value={d.years_experience ?? ''} onChange={(e) => set('years_experience', e.target.value === '' ? null : Number(e.target.value))} /></label>
       <label className="check"><input type="checkbox" checked={d.available} onChange={(e) => set('available', e.target.checked)} />Available for work</label>

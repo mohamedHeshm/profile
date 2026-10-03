@@ -1,5 +1,5 @@
-:root{--bg:#f6f5f2;--bg2:#efede8;--surface:#fff;--ink:#14151a;--muted:#62666e;--line:#dedbd3;--accent:#2b5c8a;--danger:#a63a3a;--ok:#2d6a4f;--display:"Instrument Serif",Georgia,serif;--sans:"Inter Variable",system-ui,-apple-system,"Segoe UI",sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--ease:cubic-bezier(.2,.7,.2,1);--r:10px}
-:root[data-theme=dark]{--bg:#0b0c0e;--bg2:#101216;--surface:#14161a;--ink:#ecebe8;--muted:#8d9199;--line:#23262c;--accent:#d6a85c;--danger:#e58b8b;--ok:#7fcfa5;color-scheme:dark}
+:root{--bg:#faf7f2;--bg2:#f2eee6;--surface:#fff;--ink:#17181c;--muted:#5f636b;--line:#e1dbcf;--accent:#b4452c;--danger:#b3261e;--ok:#2d6a4f;--display:"Iowan Old Style","Palatino Linotype",Charter,Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--ease:cubic-bezier(.2,.7,.2,1);--r:10px}
+:root[data-theme=dark]{--bg:#0f1012;--bg2:#15171a;--surface:#15171a;--ink:#ecebe8;--muted:#9a9ea6;--line:#26292e;--accent:#e8795a;--danger:#f08b84;--ok:#7fcfa5;color-scheme:dark}
 *{box-sizing:border-box}html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:72px}img{max-width:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.1;margin:0 0 .5em;letter-spacing:-.01em}h1{font-size:clamp(2.2rem,6vw,3.4rem)}h2{font-size:clamp(2rem,5vw,3.2rem)}h3{font-size:1.6rem}
@@ -87,3 +87,12 @@ fieldset.sections-edit{border:1px solid var(--line);border-radius:var(--r);paddi
 }
 @media(pointer:coarse){.btn,.link,.dash aside nav button{min-height:44px}.link{display:inline-flex;align-items:center;padding:0 8px}input:not([type=checkbox]){min-height:44px}.check input{width:22px;height:22px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
+
+/* Hossam design language */
+.status{border:1px solid var(--line);border-radius:999px;padding:6px 12px}.frame::after{display:none}.frame{max-width:420px}
+.cap{position:absolute;z-index:2;left:12px;bottom:12px;font:500 .72rem var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(8px);border:1px solid var(--line)}
+.stackgrid ul{display:flex;flex-wrap:wrap;gap:8px}.stackgrid li{padding:5px 12px;border:1px solid var(--line);border-radius:8px;font-size:.9rem;transition:border-color .2s,color .2s}.stackgrid li:hover{border-color:var(--accent);color:var(--accent)}
+.timeline.flat li{grid-template-columns:1fr;gap:4px;padding:18px 0}
+.contact{display:grid;gap:40px}.details{list-style:none;padding:0;margin:24px 0 0}.details li{display:grid;padding:14px 0;border-top:1px solid var(--line)}.details span{font:500 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}.details a{overflow-wrap:anywhere}
+.form{display:grid;gap:16px}.form label{font-size:.85rem}.hp{position:absolute;left:-9999px}.form-status{min-height:1.5em;margin:0;font-size:.92rem}.form-status.ok{color:var(--ok)}.form-status.err{color:var(--danger)}
+@media(min-width:860px){.contact{grid-template-columns:1fr 1fr;gap:80px}}

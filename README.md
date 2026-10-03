@@ -15,6 +15,9 @@ A single-owner portfolio: a public home page driven entirely by data, and an aut
 ## Upgrading an existing database
 After `schema.sql`, run `supabase/migrations/006_case_study.sql` (case-study fields, project slug and logo, resume link). It is additive and idempotent.
 
+## Contact form and demo content
+Run `supabase/migrations/007_contact_phone.sql` (contact messages + phone). Optionally run `supabase/seed/seed_hossam.sql` to load Hossam's real content; it needs the auth user `hossam545mohamed@gmail.com` to exist first and never overwrites existing rows.
+
 ## Build and deploy
 SPA fallback is preconfigured for Netlify (`public/_redirects`) and Vercel (`vercel.json`); on other hosts rewrite all paths to `index.html`.
 
