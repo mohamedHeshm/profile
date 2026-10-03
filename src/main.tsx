@@ -4,6 +4,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './features/auth/AuthContext'
 import ErrorBoundary from './components/ErrorBoundary'
 import { configured } from './lib/supabase'
+import '@fontsource/instrument-serif/400.css'
+import '@fontsource-variable/inter'
 import './styles.css'
 
 const Home = lazy(() => import('./pages/Home'))
@@ -13,7 +15,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 
 try {
   const saved = localStorage.getItem('theme')
-  document.documentElement.dataset.theme = saved ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  document.documentElement.dataset.theme = saved ?? 'dark'
 } catch { /* storage unavailable: keep the default theme */ }
 
 createRoot(document.getElementById('root') as HTMLElement).render(

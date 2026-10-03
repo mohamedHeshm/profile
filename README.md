@@ -12,6 +12,9 @@ A single-owner portfolio: a public home page driven entirely by data, and an aut
 5. `cp .env.example .env` and fill in the URL and **anon** key. Never put the service role key in the frontend.
 6. `npm install && npm run dev`, sign in at `/login`, fill in your profile.
 
+## Upgrading an existing database
+After `schema.sql`, run `supabase/migrations/006_case_study.sql` (case-study fields, project slug and logo, resume link). It is additive and idempotent.
+
 ## Build and deploy
 SPA fallback is preconfigured for Netlify (`public/_redirects`) and Vercel (`vercel.json`); on other hosts rewrite all paths to `index.html`.
 
@@ -21,7 +24,7 @@ SPA fallback is preconfigured for Netlify (`public/_redirects`) and Vercel (`ver
 All authorization is enforced by RLS. Visitors read only visible skills and published projects; writes require `owner_id = auth.uid()`; storage writes are restricted to the caller's folder. Client validation is a convenience: table checks and bucket limits are the enforcing layer.
 
 ## Not built yet
-Drag-and-drop reordering (up/down buttons are used instead), sitemap, and per-page Open Graph for social crawlers (meta tags are set client-side, which Google renders but most social scrapers do not; add pre-rendering or an edge function if you need link previews).
+Profile live preview, technology icons, an engineering-principles block (it would need real, owner-written content), gallery upload progress bars, image resizing (needs Supabase image transformations or a CDN), sitemap, and pre-rendered Open Graph for social crawlers.
 
 ## Security review (summary)
 - Every table has RLS. Writes need `owner_id = auth.uid()`; gallery inserts also verify the parent project belongs to the caller (no IDOR).

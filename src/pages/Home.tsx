@@ -1,27 +1,30 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { supabase } from '../lib/supabase'
-import { setFavicon, setMeta } from '../lib/seo'
-import { useProfile, useRows, useSettings } from '../hooks/useRows'
+import Nav from '../components/Nav'
 import { useAuth } from '../features/auth/AuthContext'
-import { Contact, MoreSections } from './HomeSections'
-import type { Project, Skill } from '../types'
-
-function toggleTheme() {
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'
-  document.documentElement.dataset.theme = next
-  try { localStorage.setItem('theme', next) } catch { /* storage unavailable */ }
-}
+import { useProfile, useRows, useSettings } from '../hooks/useRows'
+import { useReveal } from '../hooks/useReveal'
+import { range } from '../lib/format'
+import { setFavicon, setMeta } from '../lib/seo'
+import { SECTIONS, sectionCss } from '../lib/sections'
+import { supabase } from '../lib/supabase'
+import type { Education, Experience, Service, Skill, SocialLink } from '../types'
+import Hero from './home/Hero'
+import { About, Contact, Services, Stack, Timeline } from './home/Sections'
+import Work, { CARD_COLS, type ProjectCard } from './home/Work'
 
 export default function Home() {
   const { session, ready } = useAuth()
   const { profile, loading } = useProfile()
-  const skills = useRows<Skill>('skills', profile?.id, true)
-  const projects = useRows<Project>('projects', profile?.id, true)
-  const { settings } = useSettings(profile?.id)
-
-  // Values are constrained by CHECK constraints in the database (hex color, known section ids).
-  const css = settings ? [`:root:not([data-theme=dark]){--accent:${settings.accent}}`, ...settings.hidden_sections.map((s) => `#${s}{display:none}`), ...settings.section_order.map((s, i) => `#${s}{order:${i}}`)].join('') : ''
+  const pid = profile?.id
+  const projects = useRows<ProjectCard>('projects', pid, true, CARD_COLS).rows
+  const skills = useRows<Skill>('skills', pid, true).rows
+  const jobs = useRows<Experience>('experiences', pid, true).rows
+  const edu = useRows<Education>('education', pid, true).rows
+  const services = useRows<Service>('services', pid, true).rows
+  const links = useRows<SocialLink>('social_links', pid, true).rows
+  const { settings } = useSettings(pid)
+  useReveal(projects.length + skills.length + jobs.length + edu.length + services.length + (profile ? 1 : 0))
 
   useEffect(() => {
     if (!profile) return
@@ -34,74 +37,36 @@ export default function Home() {
     void supabase.rpc('record_view', { p_path: '/' })
   }, [ready, session])
 
-  const groups = skills.rows.reduce<Record<string, Skill[]>>((a, s) => { (a[s.category] ??= []).push(s); return a }, {})
-  const [lead, ...rest] = [...projects.rows].sort((a, b) => Number(b.featured) - Number(a.featured))
+  const hidden = settings?.hidden_sections ?? []
+  const order = settings?.section_order ?? SECTIONS.map((s) => s.id)
+  // Accent comes from a DB-validated hex color; it only applies to the light theme.
+  const css = (settings ? `:root[data-theme=light]{--accent:${settings.accent}}` : '') + sectionCss(order, hidden)
+  const present: Record<string, boolean> = { work: projects.length > 0, stack: skills.length > 0, about: Boolean(profile?.full_bio), experience: jobs.length > 0, contact: true }
+  const navItems = ['work', 'about', 'stack', 'experience', 'contact'].filter((id) => present[id] && !hidden.includes(id)).map((id) => ({ id, label: SECTIONS.find((s) => s.id === id)?.label ?? id }))
 
   return (
     <>
-      <header className="nav"><nav aria-label="Main">
-        {settings?.logo_url && <img className="logo" src={settings.logo_url} alt={profile?.full_name ?? 'Logo'} />}<a href="#work">Work</a><a href="#about">About</a><a href="#stack">Stack</a><a href="#contact">Contact</a>
-        <span className="grow" />
-        <button className="link" onClick={toggleTheme}>Theme</button>
-        {session && <Link className="btn small" to="/dashboard">Dashboard</Link>}
-      </nav></header>
-      <main className="wrap">
+      <style>{css}</style>
+      <Nav name={profile?.full_name ?? ''} logo={settings?.logo_url} items={navItems} showDashboard={Boolean(session)} />
+      <main id="top" className="wrap">
         {loading ? <div className="skeleton hero-skel" /> : !profile ? (
           <section className="empty"><h1>This portfolio is not set up yet</h1><p>Sign in and complete your profile to publish it.</p><Link className="btn primary" to="/login">Sign in</Link></section>
         ) : (
           <>
-            <section className="hero">
-              <div>
-                <h1>{profile.full_name}</h1>
-                <p className="role">{profile.job_title}</p>
-                {(settings?.hero_text || profile.short_bio) && <p className="lead">{settings?.hero_text || profile.short_bio}</p>}
-                <p className="meta">{[profile.location, profile.available ? 'Available for work' : null].filter(Boolean).join(' · ')}</p>
-                <p className="actions"><a className="btn primary" href="#work">See my work</a>{profile.email && <a className="btn" href={`mailto:${profile.email}`}>Get in touch</a>}</p>
-              </div>
-              {profile.avatar_url
-                ? <img className="portrait" src={profile.avatar_url} alt={`Portrait of ${profile.full_name}`} />
-                : <div className="portrait ph" role="img" aria-label="No photo yet">{profile.full_name.slice(0, 1)}</div>}
-            </section>
-            <div className="sections">{css && <style>{css}</style>}
-            <section id="work"><h2>Selected work</h2>
-              {projects.loading ? <div className="skeleton" /> : !lead ? <p className="muted">No projects published yet.</p> : (
-                <>
-                  <ProjectItem p={lead} large />
-                  <div className="rows">{rest.map((p) => <ProjectItem key={p.id} p={p} />)}</div>
-                </>
-              )}
-            </section>
-            {(profile.full_bio || profile.years_experience !== null) && (
-              <section id="about"><h2>About</h2>
-                {profile.full_bio && <p className="prose">{profile.full_bio}</p>}
-                {profile.years_experience !== null && <p className="muted">{profile.years_experience} years of professional experience</p>}
-              </section>
-            )}
-            <MoreSections ownerId={profile.id} />
-            {Object.keys(groups).length > 0 && (
-              <section id="stack"><h2>What I work with</h2>
-                <dl className="stack-list">{Object.entries(groups).map(([cat, list]) => (
-                  <div key={cat}><dt>{cat}</dt><dd>{list.map((s) => s.name).join(', ')}</dd></div>))}</dl>
-              </section>
-            )}
-            <Contact ownerId={profile.id} email={profile.email} /></div>
+            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} skills={skills} />
+            <div className="sections">
+              {projects.length > 0 && <Work projects={projects} />}
+              {skills.length > 0 && <Stack skills={skills} />}
+              {profile.full_bio && <About profile={profile} />}
+              {jobs.length > 0 && <Timeline id="experience" kicker="Experience" title="Where I’ve worked" entries={jobs.map((j) => ({ key: j.id, period: range(j.start_date, j.end_date, j.current), title: j.position, sub: [j.company, j.location].filter(Boolean).join(' · '), text: j.description }))} />}
+              {edu.length > 0 && <Timeline id="education" kicker="Education" title="Education" entries={edu.map((e) => ({ key: e.id, period: range(e.start_date, e.end_date), title: e.institution, sub: [e.degree, e.field].filter(Boolean).join(', '), text: e.description }))} />}
+              {services.length > 0 && <Services services={services} />}
+              <Contact email={profile.email} links={links} resume={profile.resume_url} />
+            </div>
           </>
         )}
       </main>
+      {profile && <footer className="foot">© {new Date().getFullYear()} {profile.full_name}</footer>}
     </>
-  )
-}
-
-function ProjectItem({ p, large }: { p: Project; large?: boolean }) {
-  return (
-    <article className={large ? 'project large' : 'project'}>
-      {p.image_url && <div className="thumb"><img src={p.image_url} alt="" loading="lazy" /></div>}
-      <div>
-        <h3><Link to={`/projects/${p.id}`}>{p.title}</Link></h3>
-        <p>{p.summary}</p>
-        {p.technologies.length > 0 && <p className="meta">{p.technologies.join(', ')}</p>}
-        <p className="links">{p.live_url && <a href={p.live_url} target="_blank" rel="noreferrer noopener">Live demo</a>}{p.github_url && <a href={p.github_url} target="_blank" rel="noreferrer noopener">Source</a>}</p>
-      </div>
-    </article>
   )
 }

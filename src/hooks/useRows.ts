@@ -4,20 +4,21 @@ import type { PortfolioSettings, Profile } from '../types'
 
 export type TableName = 'skills' | 'projects' | 'experiences' | 'education' | 'services' | 'social_links'
 
-export function useRows<T>(table: TableName, ownerId?: string, publicOnly = false) {
+export function useRows<T>(table: TableName, ownerId?: string, publicOnly = false, columns = '*') {
   const [rows, setRows] = useState<T[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const load = useCallback(async () => {
+    if (publicOnly && !ownerId) return
     setLoading(true)
-    let q = supabase.from(table).select('*').order('sort_order').order('created_at')
+    let q = supabase.from(table).select(columns).order('sort_order').order('created_at')
     if (ownerId) q = q.eq('owner_id', ownerId)
     if (publicOnly && table !== 'social_links') q = q.eq(table === 'projects' ? 'published' : 'visible', true)
     const { data, error: e } = await q
     if (e) setError('We could not load this data. Check your connection and try again.')
-    else { setRows(data as T[]); setError(null) }
+    else { setRows(data as unknown as T[]); setError(null) }
     setLoading(false)
-  }, [table, ownerId, publicOnly])
+  }, [table, ownerId, publicOnly, columns])
   useEffect(() => { void load() }, [load])
   return { rows, loading, error, reload: load }
 }
