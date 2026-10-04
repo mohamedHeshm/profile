@@ -59,7 +59,7 @@ export default function ProjectPage() {
             <h1 className="display">{p.title}</h1>
             {p.summary && <p className="lead">{p.summary}</p>}
             <dl className="cs-meta">
-              {p.role && <div><dt className="kicker">Role</dt><dd>{p.role}</dd></div>}
+              {p.role && <div><dt className="kicker">My role</dt><dd>{p.role}</dd></div>}
               {p.technologies.length > 0 && <div><dt className="kicker">Stack</dt><dd>{p.technologies.join(', ')}</dd></div>}
             </dl>
             <p className="case-links">
@@ -68,14 +68,14 @@ export default function ProjectPage() {
             </p>
           </header>
           {p.image_url && <div className="shot big"><span className="chrome" aria-hidden="true"><i /><i /><i /></span><img src={p.image_url} alt={`${p.title} screenshot`} width={1600} height={1000} decoding="async" /></div>}
-          <Block title="Problem"><Text v={p.problem} /></Block>
+          <Block title="Overview"><Text v={p.description} /></Block>
+          <Block title="What problem it solves"><Text v={p.problem} /></Block>
           <Block title="Solution"><Text v={p.solutions} /></Block>
           <Block title="Key features">{lines(p.features).length > 0 && <ul className="featlist">{lines(p.features).map((f) => <li key={f}>{f}</li>)}</ul>}</Block>
-          <Block title="Technology">{p.technologies.length > 0 && <ul className="tags">{p.technologies.map((t) => <li key={t}>{t}</li>)}</ul>}</Block>
+          <Block title="Tech stack">{p.technologies.length > 0 && <ul className="tags">{p.technologies.map((t) => <li key={t}>{t}</li>)}</ul>}</Block>
           <Block title="Architecture"><Text v={p.architecture} /></Block>
           <Block title="Challenges"><Text v={p.challenges} /></Block>
           <Block title="Engineering decisions"><Text v={p.decisions} /></Block>
-          <Block title="Description"><Text v={p.description} /></Block>
           <Block title="Results"><Text v={p.results} /></Block>
           {imgs.length > 0 && (
             <section className="cs-sec"><h2 className="kicker">Screenshots</h2>

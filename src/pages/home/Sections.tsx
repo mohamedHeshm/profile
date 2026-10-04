@@ -4,14 +4,22 @@ export function SectionHead({ kicker, title }: { kicker: string; title: string }
   return <header className="sec-head reveal"><p className="kicker">{kicker}</p><h2>{title}</h2></header>
 }
 
+const BUCKETS: [string, RegExp][] = [['Frontend', /front|client/i], ['Backend', /back|server|api/i], ['Database', /data ?base|sql/i], ['Tools', /tool|devops|ops/i]]
+const bucket = (cat: string) => BUCKETS.find(([, re]) => re.test(cat))?.[0] ?? 'Other technologies'
+
 export function Stack({ skills }: { skills: Skill[] }) {
-  const groups = skills.reduce<Record<string, Skill[]>>((a, s) => { (a[s.category] ??= []).push(s); return a }, {})
+  const groups: Record<string, Skill[]> = {}
+  for (const s of skills) {
+    const list = (groups[bucket(s.category)] ??= [])
+    if (!list.some((x) => x.name.toLowerCase() === s.name.toLowerCase())) list.push(s)
+  }
+  const order = [...BUCKETS.map(([n]) => n), 'Other technologies'].filter((n) => groups[n])
   return (
     <section id="stack" className="sec">
-      <SectionHead kicker="Engineering stack" title="What I build with" />
-      <div className="stack-groups">{Object.entries(groups).map(([cat, list]) => (
+      <SectionHead kicker="Skills" title="Technologies I work with" />
+      <div className="stack-groups">{order.map((cat) => (
         <div key={cat} className="sg reveal"><h3 className="kicker">{cat}</h3>
-          <ul>{list.map((s) => <li key={s.id} className={s.featured ? 'feat' : ''}><span className="mono-ic" aria-hidden="true">{s.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2)}</span><span className="nm">{s.name}</span>{s.description && <span className="ds">{s.description}</span>}</li>)}</ul></div>))}</div>
+          <ul>{groups[cat].map((s) => <li key={s.id} className={s.featured ? 'feat' : ''}><span className="nm">{s.name}</span>{s.description && <span className="ds">{s.description}</span>}</li>)}</ul></div>))}</div>
     </section>
   )
 }
@@ -35,6 +43,7 @@ export function About({ profile, education, exploring }: { profile: Profile; edu
         <div>
           <p className="kicker">About</p>
           <h2>Software Engineer<br />who cares about<br />the details.</h2>
+          <ul className="pillars"><li>Software Engineer</li><li>Full Stack Developer</li><li>Problem Solver</li></ul>
           {profile.full_bio && <p className="statement">{profile.full_bio}</p>}
           <dl className="facts">{facts.map(([k, v]) => <div key={k}><dt className="kicker">{k}</dt><dd>{v}</dd></div>)}</dl>
         </div>
@@ -67,12 +76,6 @@ export function Exploring({ items }: { items: string[] }) {
       <ul className="explore">{items.map((t, i) => <li key={t} className="reveal"><span className="kicker">Note {String(i + 1).padStart(2, '0')}</span><p>{t}</p></li>)}</ul>
     </section>
   )
-}
-
-export function Marquee({ items }: { items: string[] }) {
-  if (items.length < 3) return null
-  const row = [...items, ...items]
-  return <div className="marquee" aria-hidden="true"><div className="track">{row.map((t, i) => <span key={i}>{t}</span>)}</div></div>
 }
 
 export interface Entry { key: string; period: string; title: string; sub: string; text: string }

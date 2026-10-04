@@ -1,5 +1,5 @@
 export const SECTIONS = [
-  { id: 'work', label: 'Projects' }, { id: 'about', label: 'About' }, { id: 'stack', label: 'Stack' }, { id: 'process', label: 'Process' }, { id: 'experience', label: 'Experience' },
+  { id: 'work', label: 'Projects' }, { id: 'about', label: 'About' }, { id: 'stack', label: 'Skills' }, { id: 'process', label: 'Process' }, { id: 'experience', label: 'Experience' },
   { id: 'education', label: 'Education' }, { id: 'services', label: 'Services' }, { id: 'exploring', label: 'Exploring' }, { id: 'contact', label: 'Contact' },
 ] as const
 export const DEFAULT_ACCENT = '#4b4fb0'

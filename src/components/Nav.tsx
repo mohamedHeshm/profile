@@ -28,7 +28,7 @@ export default function Nav({ name, logo, items, showDashboard }: Props) {
   return (
     <header className="nav">
       <div className="nav-in">
-        <a href="#home" className="brand-link" aria-label={`${name}, home`}>{logo ? <img className="logo" src={logo} alt="" /> : <><i>{'{'}</i>{name.split(/\s+/)[0]}<i>{'}'}</i></>}</a>
+        <a href="#home" className="brand-link" aria-label={`${name}, home`}>{logo ? <img className="logo" src={logo} alt="" /> : name}</a>
         <nav aria-label="Main" className="nav-links">
           {items.map((i) => <a key={i.id} href={`#${i.id}`} className={active === i.id ? 'active' : ''} aria-current={active === i.id ? 'true' : undefined}>{i.label}</a>)}
         </nav>

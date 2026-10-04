@@ -11,7 +11,7 @@ import { supabase } from '../lib/supabase'
 import type { Education, Experience, Service, Skill, SocialLink } from '../types'
 import Contact from './home/Contact'
 import Hero from './home/Hero'
-import { About, Exploring, Marquee, Process, Services, Stack, Statement, Timeline } from './home/Sections'
+import { About, Exploring, Process, Services, Stack, Statement, Timeline } from './home/Sections'
 import Work, { CARD_COLS, type ProjectCard } from './home/Work'
 
 export default function Home() {
@@ -42,9 +42,8 @@ export default function Home() {
   const exploring = settings?.exploring ?? []
   // Accent comes from a DB-validated hex color; it only applies to the light theme.
   const css = (settings ? `:root[data-theme=light]{--accent:${settings.accent}}` : '') + sectionCss(fullOrder(settings?.section_order), hidden)
-  const stack = (skills.some((s) => s.featured) ? skills.filter((s) => s.featured) : skills).map((s) => s.name)
   const present: Record<string, boolean> = { home: true, work: projects.length > 0, about: Boolean(profile?.full_bio), stack: skills.length > 0, contact: true }
-  const nav = [['home', 'Home'], ['about', 'About'], ['stack', 'Stack'], ['work', 'Projects'], ['contact', 'Contact']].filter(([id]) => present[id] && !hidden.includes(id)).map(([id, label]) => ({ id, label }))
+  const nav = [['home', 'Home'], ['about', 'About'], ['stack', 'Skills'], ['work', 'Projects'], ['contact', 'Contact']].filter(([id]) => present[id] && !hidden.includes(id)).map(([id, label]) => ({ id, label }))
   const eduLine = edu[0] ? [edu[0].degree, edu[0].institution].filter(Boolean).join(', ') : ''
 
   return (
@@ -56,8 +55,7 @@ export default function Home() {
           <section className="empty"><h1>This portfolio is not set up yet</h1><p>Sign in and complete your profile to publish it.</p><Link className="btn primary" to="/login">Sign in</Link></section>
         ) : (
           <>
-            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} stack={stack} projects={projects} />
-            <Marquee items={stack.slice(0, 10)} />
+            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} />
             <Statement text={profile.short_bio} />
             <div className="sections">
               {projects.length > 0 && <Work projects={projects} />}
@@ -75,7 +73,7 @@ export default function Home() {
       </main>
       {profile && (
         <footer className="foot">
-          <p><strong>{'{'}{profile.full_name.split(/\s+/)[0]}{'}'}</strong> · {profile.job_title} · © {new Date().getFullYear()}</p>
+          <p><strong>{profile.full_name}</strong> · {profile.job_title} · © {new Date().getFullYear()}</p>
           <ul className="social">{links.filter((l) => /github|linkedin/i.test(l.platform)).map((l) => <li key={l.id}><a href={l.url} target="_blank" rel="noreferrer noopener">{l.platform}</a></li>)}{profile.email && <li><a href={`mailto:${profile.email}`}>Email</a></li>}</ul>
           <p className="muted mono">Built with React · TypeScript · Supabase</p>
         </footer>
