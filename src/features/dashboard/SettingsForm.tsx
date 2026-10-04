@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
 import { useSettings } from '../../hooks/useRows'
 import ImageField from './ImageField'
-import { DEFAULT_ACCENT, SECTIONS } from '../../lib/sections'
+import { lines } from '../../lib/format'
+import { DEFAULT_ACCENT, SECTIONS, fullOrder } from '../../lib/sections'
 
 const IDS: string[] = SECTIONS.map((s) => s.id)
 const label = (id: string) => SECTIONS.find((s) => s.id === id)?.label ?? id
@@ -14,6 +15,7 @@ export default function SettingsForm({ uid }: { uid: string }) {
   const [order, setOrder] = useState<string[]>(IDS)
   const [hidden, setHidden] = useState<string[]>([])
   const [heroText, setHeroText] = useState('')
+  const [exploring, setExploring] = useState('')
   const [logo, setLogo] = useState<string | null>(null)
   const [favicon, setFavicon] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
@@ -21,9 +23,8 @@ export default function SettingsForm({ uid }: { uid: string }) {
 
   useEffect(() => {
     if (loading) return
-    const saved = (settings?.section_order ?? []).filter((s) => IDS.includes(s))
     setTitle(settings?.site_title ?? ''); setAccent(settings?.accent ?? DEFAULT_ACCENT)
-    setOrder([...saved, ...IDS.filter((s) => !saved.includes(s))]); setHidden(settings?.hidden_sections ?? [])
+    setOrder(fullOrder(settings?.section_order)); setExploring((settings?.exploring ?? []).join('\n')); setHidden(settings?.hidden_sections ?? [])
     setHeroText(settings?.hero_text ?? ''); setLogo(settings?.logo_url ?? null); setFavicon(settings?.favicon_url ?? null)
   }, [settings, loading])
 
@@ -32,7 +33,7 @@ export default function SettingsForm({ uid }: { uid: string }) {
 
   async function save(e: FormEvent) {
     e.preventDefault(); setBusy(true); setMsg(null)
-    const { error } = await supabase.from('portfolio_settings').upsert({ owner_id: uid, site_title: title.trim(), hero_text: heroText.trim(), logo_url: logo, favicon_url: favicon, accent, section_order: order, hidden_sections: hidden })
+    const { error } = await supabase.from('portfolio_settings').upsert({ owner_id: uid, site_title: title.trim(), hero_text: heroText.trim(), exploring: lines(exploring).slice(0, 6).map((l) => l.slice(0, 100)), logo_url: logo, favicon_url: favicon, accent, section_order: order, hidden_sections: hidden })
     setBusy(false)
     if (error) setMsg({ ok: false, text: 'Unable to save settings. Save your profile first, then try again.' })
     else { setMsg({ ok: true, text: 'Settings saved.' }); void reload() }
@@ -42,6 +43,7 @@ export default function SettingsForm({ uid }: { uid: string }) {
     <form onSubmit={save} className="stack" aria-busy={busy}>
       <label>Website title<input maxLength={80} value={title} onChange={(e) => setTitle(e.target.value)} /></label>
       <label>Hero text (replaces your short bio under your name)<textarea rows={2} maxLength={160} value={heroText} onChange={(e) => setHeroText(e.target.value)} /></label>
+      <label>Currently exploring (one per line, up to 6)<textarea rows={3} value={exploring} onChange={(e) => setExploring(e.target.value)} /></label>
       <ImageField uid={uid} label="logo" value={logo} onChange={setLogo} />
       <ImageField uid={uid} label="favicon" value={favicon} onChange={setFavicon} />
       <label>Accent color (light theme)<input type="color" value={accent} onChange={(e) => setAccent(e.target.value)} /></label>

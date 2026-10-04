@@ -5,13 +5,13 @@ import { useAuth } from '../features/auth/AuthContext'
 import { useProfile, useRows, useSettings } from '../hooks/useRows'
 import { useReveal } from '../hooks/useReveal'
 import { range } from '../lib/format'
+import { fullOrder, sectionCss } from '../lib/sections'
 import { setFavicon, setMeta } from '../lib/seo'
-import { SECTIONS, sectionCss } from '../lib/sections'
 import { supabase } from '../lib/supabase'
 import type { Education, Experience, Service, Skill, SocialLink } from '../types'
-import Hero from './home/Hero'
 import Contact from './home/Contact'
-import { About, Services, Stack, Timeline } from './home/Sections'
+import Hero from './home/Hero'
+import { About, Exploring, Marquee, Process, Services, Stack, Statement, Timeline } from './home/Sections'
 import Work, { CARD_COLS, type ProjectCard } from './home/Work'
 
 export default function Home() {
@@ -39,35 +39,47 @@ export default function Home() {
   }, [ready, session])
 
   const hidden = settings?.hidden_sections ?? []
-  const order = settings?.section_order ?? SECTIONS.map((s) => s.id)
+  const exploring = settings?.exploring ?? []
   // Accent comes from a DB-validated hex color; it only applies to the light theme.
-  const css = (settings ? `:root[data-theme=light]{--accent:${settings.accent}}` : '') + sectionCss(order, hidden)
-  const present: Record<string, boolean> = { work: projects.length > 0, stack: skills.length > 0, about: Boolean(profile?.full_bio), experience: jobs.length > 0, contact: true }
-  const navItems = ['work', 'about', 'stack', 'experience', 'contact'].filter((id) => present[id] && !hidden.includes(id)).map((id) => ({ id, label: SECTIONS.find((s) => s.id === id)?.label ?? id }))
+  const css = (settings ? `:root[data-theme=light]{--accent:${settings.accent}}` : '') + sectionCss(fullOrder(settings?.section_order), hidden)
+  const stack = (skills.some((s) => s.featured) ? skills.filter((s) => s.featured) : skills).map((s) => s.name)
+  const present: Record<string, boolean> = { home: true, work: projects.length > 0, about: Boolean(profile?.full_bio), stack: skills.length > 0, contact: true }
+  const nav = [['home', 'Home'], ['about', 'About'], ['stack', 'Stack'], ['work', 'Projects'], ['contact', 'Contact']].filter(([id]) => present[id] && !hidden.includes(id)).map(([id, label]) => ({ id, label }))
+  const eduLine = edu[0] ? [edu[0].degree, edu[0].institution].filter(Boolean).join(', ') : ''
 
   return (
     <>
       <style>{css}</style>
-      <Nav name={profile?.full_name ?? ''} logo={settings?.logo_url} items={navItems} showDashboard={Boolean(session)} />
-      <main id="top" className="wrap">
+      <Nav name={profile?.full_name ?? ''} logo={settings?.logo_url} items={nav} showDashboard={Boolean(session)} />
+      <main id="main" className="wrap">
         {loading ? <div className="skeleton hero-skel" /> : !profile ? (
           <section className="empty"><h1>This portfolio is not set up yet</h1><p>Sign in and complete your profile to publish it.</p><Link className="btn primary" to="/login">Sign in</Link></section>
         ) : (
           <>
-            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} />
+            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} stack={stack} projects={projects} />
+            <Marquee items={stack.slice(0, 10)} />
+            <Statement text={profile.short_bio} />
             <div className="sections">
               {projects.length > 0 && <Work projects={projects} />}
+              {profile.full_bio && <About profile={profile} education={eduLine} exploring={exploring} />}
               {skills.length > 0 && <Stack skills={skills} />}
-              {profile.full_bio && <About profile={profile} />}
+              <Process />
               {jobs.length > 0 && <Timeline id="experience" kicker="Experience" title="Where I’ve worked" entries={jobs.map((j) => ({ key: j.id, period: range(j.start_date, j.end_date, j.current), title: j.position, sub: [j.company, j.location].filter(Boolean).join(' · '), text: j.description }))} />}
               {edu.length > 0 && <Timeline id="education" kicker="Education" title="Education" entries={edu.map((e) => ({ key: e.id, period: range(e.start_date, e.end_date), title: e.institution, sub: [e.degree, e.field].filter(Boolean).join(', '), text: e.description }))} />}
               {services.length > 0 && <Services services={services} />}
+              {exploring.length > 0 && <Exploring items={exploring} />}
               <Contact email={profile.email} phone={profile.phone} links={links} />
             </div>
           </>
         )}
       </main>
-      {profile && <footer className="foot"><strong>{profile.full_name}</strong> · {profile.job_title}<span> © {new Date().getFullYear()}</span></footer>}
+      {profile && (
+        <footer className="foot">
+          <p><strong>{'{'}{profile.full_name.split(/\s+/)[0]}{'}'}</strong> · {profile.job_title} · © {new Date().getFullYear()}</p>
+          <ul className="social">{links.filter((l) => /github|linkedin/i.test(l.platform)).map((l) => <li key={l.id}><a href={l.url} target="_blank" rel="noreferrer noopener">{l.platform}</a></li>)}{profile.email && <li><a href={`mailto:${profile.email}`}>Email</a></li>}</ul>
+          <p className="muted mono">Built with React · TypeScript · Supabase</p>
+        </footer>
+      )}
     </>
   )
 }

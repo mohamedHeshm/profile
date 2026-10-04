@@ -10,7 +10,7 @@ import GalleryEditor from './GalleryEditor'
 
 type Draft = Omit<Project, 'id' | 'owner_id' | 'sort_order' | 'updated_at'>
 type TextKey = 'category' | 'role' | 'description' | 'problem' | 'solutions' | 'features' | 'architecture' | 'challenges' | 'decisions' | 'results'
-const empty: Draft = { title: '', slug: null, category: '', summary: '', description: '', problem: '', solutions: '', features: '', architecture: '', challenges: '', decisions: '', results: '', role: '', image_url: null, logo_url: null, technologies: [], github_url: null, live_url: null, featured: false, published: false }
+const empty: Draft = { year: null, title: '', slug: null, category: '', summary: '', description: '', problem: '', solutions: '', features: '', architecture: '', challenges: '', decisions: '', results: '', role: '', image_url: null, logo_url: null, technologies: [], github_url: null, live_url: null, featured: false, published: false }
 const TEXT: [TextKey, string, number][] = [['category', 'Category', 1], ['role', 'Your role', 1], ['problem', 'Problem it solves', 3], ['solutions', 'Solution', 3], ['features', 'Key features (one per line)', 4], ['architecture', 'Architecture', 3], ['challenges', 'Challenges', 3], ['decisions', 'Engineering decisions', 3], ['results', 'Results (real outcomes only)', 3], ['description', 'Extra description', 3]]
 
 export default function ProjectsManager({ uid }: { uid: string }) {
@@ -55,6 +55,7 @@ export default function ProjectsManager({ uid }: { uid: string }) {
     <form onSubmit={save} className="stack wide" aria-busy={busy}>
       <label>Project name<input required maxLength={120} value={d.title} onChange={(e) => set('title', e.target.value)} /></label>
       <label>URL slug (optional, e.g. clinic-platform)<input maxLength={60} value={d.slug ?? ''} onChange={(e) => set('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') || null)} /></label>
+      <label>Year<input type="number" min={2000} max={2100} value={d.year ?? ''} onChange={(e) => set('year', e.target.value === '' ? null : Number(e.target.value))} /></label>
       <label>Short description<input maxLength={200} value={d.summary} onChange={(e) => set('summary', e.target.value)} /></label>
       {TEXT.map(([k, label, rowsN]) => <label key={k}>{label}<textarea rows={rowsN} value={d[k]} onChange={(e) => set(k, e.target.value)} /></label>)}
       <label>Technologies (comma separated)<input value={d.technologies.join(', ')} onChange={(e) => set('technologies', e.target.value.split(',').map((t) => t.trim()).filter(Boolean))} /></label>

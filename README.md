@@ -15,6 +15,9 @@ A single-owner portfolio: a public home page driven entirely by data, and an aut
 ## Upgrading an existing database
 After `schema.sql`, run `supabase/migrations/006_case_study.sql` (case-study fields, project slug and logo, resume link). It is additive and idempotent.
 
+## Stack notes and exploring list
+Run `supabase/migrations/008_stack_exploring.sql` (skill descriptions, project year, exploring notes, new section ids). Optional: `supabase/seed/seed_008_hossam_details.sql`.
+
 ## Contact form and demo content
 Run `supabase/migrations/007_contact_phone.sql` (contact messages + phone). Optionally run `supabase/seed/seed_hossam.sql` to load Hossam's real content; it needs the auth user `hossam545mohamed@gmail.com` to exist first and never overwrites existing rows.
 

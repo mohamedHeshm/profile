@@ -8,25 +8,71 @@ export function Stack({ skills }: { skills: Skill[] }) {
   const groups = skills.reduce<Record<string, Skill[]>>((a, s) => { (a[s.category] ??= []).push(s); return a }, {})
   return (
     <section id="stack" className="sec">
-      <SectionHead kicker="Engineering stack" title="What I work with" />
-      <div className="stackgrid">{Object.entries(groups).map(([cat, list]) => (
-        <div key={cat} className="reveal"><h3 className="kicker">{cat}</h3><ul>{list.map((s) => <li key={s.id} className={s.featured ? 'feat' : ''}>{s.name}</li>)}</ul></div>))}</div>
+      <SectionHead kicker="Engineering stack" title="What I build with" />
+      <div className="stack-groups">{Object.entries(groups).map(([cat, list]) => (
+        <div key={cat} className="sg reveal"><h3 className="kicker">{cat}</h3>
+          <ul>{list.map((s) => <li key={s.id} className={s.featured ? 'feat' : ''}><span className="mono-ic" aria-hidden="true">{s.name.replace(/[^A-Za-z0-9]/g, '').slice(0, 2)}</span><span className="nm">{s.name}</span>{s.description && <span className="ds">{s.description}</span>}</li>)}</ul></div>))}</div>
     </section>
   )
 }
 
-export function About({ profile }: { profile: Profile }) {
+export function Statement({ text }: { text: string }) {
+  return (
+    <section className="statement-sec reveal" aria-label="Engineering statement">
+      <p className="big">I build digital products where <em>engineering</em>, <em>performance</em> and <em>design</em> meet.</p>
+      {text && <p className="muted">{text}</p>}
+    </section>
+  )
+}
+
+export function About({ profile, education, exploring }: { profile: Profile; education: string; exploring: string[] }) {
   const y = profile.years_experience
-  const facts = [['Based in', profile.location], ['Experience', y === null ? '' : `${y} ${y === 1 ? 'year' : 'years'}`], ['Status', profile.available ? 'Open to new work' : 'Not currently available']].filter(([, v]) => v)
+  const facts = [['Location', profile.location], ['Education', education], ['Role', profile.job_title], ['Experience', y === null ? '' : `${y} ${y === 1 ? 'year' : 'years'}`], ['Current focus', exploring.join(', ')]].filter(([, v]) => v)
   return (
     <section id="about" className="sec">
-      <SectionHead kicker="About" title="Who I am" />
-      <div className="about reveal">
-        <p className="statement">{profile.full_bio}</p>
-        <dl className="facts">{facts.map(([k, v]) => <div key={k}><dt className="kicker">{k}</dt><dd>{v}</dd></div>)}</dl>
+      <div className="about2 reveal">
+        <figure className="about-ph">{profile.avatar_url ? <img src={profile.avatar_url} alt={`Portrait of ${profile.full_name}`} width={800} height={1000} loading="lazy" decoding="async" /> : <div className="frame-ph" role="img" aria-label="No portrait yet">{profile.full_name.slice(0, 1)}</div>}</figure>
+        <div>
+          <p className="kicker">About</p>
+          <h2>Software Engineer<br />who cares about<br />the details.</h2>
+          {profile.full_bio && <p className="statement">{profile.full_bio}</p>}
+          <dl className="facts">{facts.map(([k, v]) => <div key={k}><dt className="kicker">{k}</dt><dd>{v}</dd></div>)}</dl>
+        </div>
       </div>
     </section>
   )
+}
+
+const STEPS: [string, string][] = [
+  ['Understand', 'Clarify the problem, the users and the constraints before writing code.'],
+  ['Design', 'Plan the architecture, the data model and the interface together.'],
+  ['Build', 'Implement in small, typed, reviewable pieces.'],
+  ['Test', 'Check behavior, edge cases and failure states.'],
+  ['Refine', 'Tighten performance, accessibility and the small details.'],
+  ['Deploy', 'Ship it, watch how it behaves, and keep improving.'],
+]
+export function Process() {
+  return (
+    <section id="process" className="sec">
+      <SectionHead kicker="How I work" title="From problem to product" />
+      <ol className="process">{STEPS.map(([t, d], i) => <li key={t} className="reveal"><span className="kicker">{String(i + 1).padStart(2, '0')}</span><h3>{t}</h3><p>{d}</p></li>)}</ol>
+    </section>
+  )
+}
+
+export function Exploring({ items }: { items: string[] }) {
+  return (
+    <section id="exploring" className="sec">
+      <SectionHead kicker="Engineering notes" title="Currently exploring" />
+      <ul className="explore">{items.map((t, i) => <li key={t} className="reveal"><span className="kicker">Note {String(i + 1).padStart(2, '0')}</span><p>{t}</p></li>)}</ul>
+    </section>
+  )
+}
+
+export function Marquee({ items }: { items: string[] }) {
+  if (items.length < 3) return null
+  const row = [...items, ...items]
+  return <div className="marquee" aria-hidden="true"><div className="track">{row.map((t, i) => <span key={i}>{t}</span>)}</div></div>
 }
 
 export interface Entry { key: string; period: string; title: string; sub: string; text: string }

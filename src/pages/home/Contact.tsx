@@ -31,7 +31,7 @@ export default function Contact({ email, phone, links }: Props) {
       <div className="contact">
         <div className="reveal">
           <p className="kicker">Get in touch</p>
-          <h2 id="contact-title">Let’s build something useful.</h2>
+          <h2 id="contact-title">Let’s build something<br />worth shipping.</h2>
           <p className="muted">Have a project in mind or just want to say hello?</p>
           <ul className="details">
             {email && <li><span>Email</span><a href={`mailto:${email}`}>{email}</a></li>}

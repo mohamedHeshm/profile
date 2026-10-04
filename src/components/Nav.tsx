@@ -5,7 +5,7 @@ import { toggleTheme } from '../lib/theme'
 interface Props { name: string; logo?: string | null; items: { id: string; label: string }[]; showDashboard: boolean }
 
 export default function Nav({ name, logo, items, showDashboard }: Props) {
-  const [active, setActive] = useState('')
+  const [active, setActive] = useState('home')
   const [open, setOpen] = useState(false)
   const key = items.map((i) => i.id).join()
 
@@ -28,7 +28,7 @@ export default function Nav({ name, logo, items, showDashboard }: Props) {
   return (
     <header className="nav">
       <div className="nav-in">
-        <a href="#top" className="brand-link">{logo ? <img className="logo" src={logo} alt={name} /> : name}</a>
+        <a href="#home" className="brand-link" aria-label={`${name}, home`}>{logo ? <img className="logo" src={logo} alt="" /> : <><i>{'{'}</i>{name.split(/\s+/)[0]}<i>{'}'}</i></>}</a>
         <nav aria-label="Main" className="nav-links">
           {items.map((i) => <a key={i.id} href={`#${i.id}`} className={active === i.id ? 'active' : ''} aria-current={active === i.id ? 'true' : undefined}>{i.label}</a>)}
         </nav>
