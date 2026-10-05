@@ -1,6 +1,8 @@
-import type { Profile, SocialLink } from '../../types'
+import { FiFileText } from 'react-icons/fi'
+import SocialLink from '../../components/SocialLink'
+import type { Profile, SocialLink as SocialLinkRow } from '../../types'
 
-interface Props { profile: Profile; lead: string; links: SocialLink[] }
+interface Props { profile: Profile; lead: string; links: SocialLinkRow[] }
 
 export default function Hero({ profile, lead, links }: Props) {
   return (
@@ -15,8 +17,8 @@ export default function Hero({ profile, lead, links }: Props) {
           <a className="btn" href="#contact">Contact Me</a>
         </p>
         <ul className="social">
-          {links.map((l) => <li key={l.id}><a href={l.url} target="_blank" rel="noreferrer noopener">{l.platform}</a></li>)}
-          {profile.resume_url && <li><a href={profile.resume_url} target="_blank" rel="noreferrer noopener">Resume</a></li>}
+          {links.map((l) => <li key={l.id}><SocialLink name={l.platform} href={l.url} /></li>)}
+          {profile.resume_url && <li><SocialLink name="Resume" href={profile.resume_url} icon={FiFileText} /></li>}
         </ul>
       </div>
       {profile.avatar_url && (

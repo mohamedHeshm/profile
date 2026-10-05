@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Nav from '../components/Nav'
+import SocialLink from '../components/SocialLink'
 import { useAuth } from '../features/auth/AuthContext'
 import { useProfile, useRows, useSettings } from '../hooks/useRows'
 import { useReveal } from '../hooks/useReveal'
@@ -8,7 +9,7 @@ import { range } from '../lib/format'
 import { fullOrder, sectionCss } from '../lib/sections'
 import { setFavicon, setMeta } from '../lib/seo'
 import { supabase } from '../lib/supabase'
-import type { Education, Experience, Service, Skill, SocialLink } from '../types'
+import type { Education, Experience, Service, Skill, SocialLink as SocialLinkRow } from '../types'
 import Contact from './home/Contact'
 import Hero from './home/Hero'
 import { About, Exploring, Process, Services, Stack, Statement, Timeline } from './home/Sections'
@@ -23,7 +24,7 @@ export default function Home() {
   const jobs = useRows<Experience>('experiences', pid, true).rows
   const edu = useRows<Education>('education', pid, true).rows
   const services = useRows<Service>('services', pid, true).rows
-  const links = useRows<SocialLink>('social_links', pid, true).rows
+  const links = useRows<SocialLinkRow>('social_links', pid, true).rows
   const { settings } = useSettings(pid)
   useReveal(projects.length + skills.length + jobs.length + edu.length + services.length + (profile ? 1 : 0))
 
@@ -74,7 +75,7 @@ export default function Home() {
       {profile && (
         <footer className="foot">
           <p><strong>{profile.full_name}</strong> · {profile.job_title} · © {new Date().getFullYear()}</p>
-          <ul className="social">{links.filter((l) => /github|linkedin/i.test(l.platform)).map((l) => <li key={l.id}><a href={l.url} target="_blank" rel="noreferrer noopener">{l.platform}</a></li>)}{profile.email && <li><a href={`mailto:${profile.email}`}>Email</a></li>}</ul>
+          <ul className="social">{links.filter((l) => /github|linkedin/i.test(l.platform)).map((l) => <li key={l.id}><SocialLink name={l.platform} href={l.url} /></li>)}{profile.email && <li><SocialLink name="Email" href={`mailto:${profile.email}`} /></li>}</ul>
           <p className="muted mono">Built with React · TypeScript · Supabase</p>
         </footer>
       )}

@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
-import type { SocialLink } from '../../types'
+import SocialLink from '../../components/SocialLink'
+import type { SocialLink as SocialLinkRow } from '../../types'
 
-interface Props { email: string; phone: string; links: SocialLink[] }
+interface Props { email: string; phone: string; links: SocialLinkRow[] }
 type Status = { kind: 'idle' | 'sending' | 'ok' | 'err'; text: string }
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -33,10 +34,10 @@ export default function Contact({ email, phone, links }: Props) {
           <p className="kicker">Get in touch</p>
           <h2 id="contact-title">Let’s build something<br />worth shipping.</h2>
           <p className="muted">Have a project in mind or just want to say hello?</p>
-          <ul className="details">
-            {email && <li><span>Email</span><a href={`mailto:${email}`}>{email}</a></li>}
-            {phone && <li><span>Phone</span><a href={`tel:${phone.replace(/[^+\d]/g, '')}`}>{phone}</a></li>}
-            {links.map((l) => <li key={l.id}><span>{l.platform}</span><a href={l.url} target="_blank" rel="noreferrer noopener">{l.url.replace(/^https?:\/\/(www\.)?/, '')}</a></li>)}
+          <ul className="clinks">
+            {email && <li><SocialLink name="Email" href={`mailto:${email}`} /></li>}
+            {phone && <li><SocialLink name="Phone" href={`tel:${phone.replace(/[^+\d]/g, '')}`} /></li>}
+            {links.map((l) => <li key={l.id}><SocialLink name={l.platform} href={l.url} /></li>)}
           </ul>
         </div>
         <form className="form reveal" onSubmit={(e) => void submit(e)} noValidate aria-busy={st.kind === 'sending'}>
