@@ -9,6 +9,7 @@ import './styles.css'
 const Home = lazy(() => import('./pages/Home'))
 const Login = lazy(() => import('./pages/Login'))
 const ProjectPage = lazy(() => import('./pages/ProjectPage'))
+const Projects = lazy(() => import('./pages/Projects'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 
 try {
@@ -26,7 +27,8 @@ createRoot(document.getElementById('root') as HTMLElement).render(
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/projects/:id" element={<ProjectPage />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/projects/:slug" element={<ProjectPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="*" element={<main className="auth"><h1>Page not found</h1><a href="/">Back to site</a></main>} />
           </Routes>

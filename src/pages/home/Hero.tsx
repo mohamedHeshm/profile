@@ -1,12 +1,14 @@
 import { FiFileText } from 'react-icons/fi'
 import SocialLink from '../../components/SocialLink'
 import type { Profile, SocialLink as SocialLinkRow } from '../../types'
+import HeroShowcase from './HeroShowcase'
+import type { ProjectCard } from './Work'
 
-interface Props { profile: Profile; lead: string; links: SocialLinkRow[] }
+interface Props { profile: Profile; lead: string; links: SocialLinkRow[]; projects: ProjectCard[] }
 
-export default function Hero({ profile, lead, links }: Props) {
+export default function Hero({ profile, lead, links, projects }: Props) {
   return (
-    <section id="home" className={`hero${profile.avatar_url ? '' : ' solo'}`} aria-labelledby="name">
+    <section id="home" className={`hero${projects.length ? '' : ' solo'}`} aria-labelledby="name">
       <div className="hero-copy">
         {profile.available && <p className="status"><span className="dot" aria-hidden="true" />Available for work</p>}
         <h1 id="name" className="display">{profile.full_name}</h1>
@@ -21,9 +23,7 @@ export default function Hero({ profile, lead, links }: Props) {
           {profile.resume_url && <li><SocialLink name="Resume" href={profile.resume_url} icon={FiFileText} /></li>}
         </ul>
       </div>
-      {profile.avatar_url && (
-        <figure className="portrait"><img src={profile.avatar_url} alt={`Portrait of ${profile.full_name}`} width={800} height={1000} decoding="async" /></figure>
-      )}
+      <HeroShowcase projects={projects} />
     </section>
   )
 }

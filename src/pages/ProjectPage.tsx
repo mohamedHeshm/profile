@@ -17,8 +17,11 @@ function Block({ title, children }: { title: string; children?: ReactNode }) {
 const Text = ({ v }: { v: string }) => (v ? <p className="prose">{v}</p> : null)
 
 export default function ProjectPage() {
-  const { key = '' } = useParams()
+  const { slug = '' } = useParams<{ slug: string }>()
+  const key = slug.toLowerCase() // slugs are stored lowercase (enforced by the database)
   const [p, setP] = useState<Project | null | undefined>(undefined)
+  const [failed, setFailed] = useState(false)
+  const [tries, setTries] = useState(0)
   const [imgs, setImgs] = useState<Img[]>([])
   const [sibs, setSibs] = useState<Sib[]>([])
   const [zoom, setZoom] = useState<string | null>(null)
@@ -26,13 +29,14 @@ export default function ProjectPage() {
   useReveal(p?.id)
 
   useEffect(() => {
-    setP(undefined); setImgs([])
+    setP(undefined); setImgs([]); setFailed(false)
     void (async () => {
       // RLS returns published projects to visitors and drafts only to their owner.
       const [one, list] = await Promise.all([
         supabase.from('projects').select('*').eq(UUID.test(key) ? 'id' : 'slug', key).maybeSingle(),
         supabase.from('projects').select('id,slug,title').eq('published', true).order('sort_order'),
       ])
+      if (one.error) { setFailed(true); setP(null); return }
       const proj = (one.data as Project | null) ?? null
       setP(proj); setSibs((list.data as Sib[] | null) ?? [])
       if (proj) {
@@ -40,7 +44,7 @@ export default function ProjectPage() {
         setImgs((g.data as Img[] | null) ?? [])
       }
     })()
-  }, [key])
+  }, [key, tries])
   useEffect(() => { if (p) setMeta({ title: `${p.title} — Case study`, description: p.summary, image: p.image_url }) }, [p])
   useEffect(() => { if (zoom) dlg.current?.showModal() }, [zoom])
 
@@ -48,9 +52,11 @@ export default function ProjectPage() {
   const next = sibs.length > 1 && i >= 0 ? sibs[(i + 1) % sibs.length] : null
   return (
     <main className="wrap case-page">
-      <p><Link to="/" className="back">← All work</Link></p>
+      <p><Link to="/projects" className="back">← Back to all projects</Link></p>
       {p === undefined ? <div className="skeleton hero-skel" /> : p === null ? (
-        <section className="empty"><h1>Project not found</h1><p>It may have been unpublished or the link is wrong.</p></section>
+        failed
+          ? <section className="empty"><h1>We couldn’t load this project</h1><p>Check your connection and try again.</p><button className="btn primary" onClick={() => setTries(tries + 1)}>Try again</button></section>
+          : <section className="empty"><h1>Project not found</h1><p>It may have been unpublished or the link is wrong.</p><Link className="btn primary" to="/projects">Back to Projects</Link></section>
       ) : (
         <article>
           {!p.published && <p className="draft">Draft preview. Only you can see this page.</p>}

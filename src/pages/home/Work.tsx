@@ -44,7 +44,7 @@ export default function Work({ projects }: { projects: ProjectCard[] }) {
               </Link>
               <div className="pbody">
                 <p className="kicker">{[p.category, p.year].filter(Boolean).join(' · ') || 'Project'}</p>
-                <h3><Link to={path}>{p.title}</Link></h3>
+                <h3><Link to={path}>{p.title}<span className="parrow"><ArrowUpRight /></span></Link></h3>
                 {p.summary && <p className="pdesc">{p.summary}</p>}
                 {p.technologies.length > 0 && <ul className="tags">{p.technologies.slice(0, 5).map((t) => <li key={t}>{t}</li>)}</ul>}
                 {(p.live_url || p.github_url) && (
