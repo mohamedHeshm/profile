@@ -13,7 +13,7 @@ import type { Education, Experience, Service, Skill, SocialLink as SocialLinkRow
 import Contact from './home/Contact'
 import Hero from './home/Hero'
 import { About, Exploring, Process, Services, Stack, Statement, Timeline } from './home/Sections'
-import { CARD_COLS, type ProjectCard } from './home/Work'
+import Work, { CARD_COLS, type ProjectCard } from './home/Work'
 
 export default function Home() {
   const { session, ready } = useAuth()
@@ -39,12 +39,13 @@ export default function Home() {
     void supabase.rpc('record_view', { p_path: '/' })
   }, [ready, session])
 
+  const stack = (skills.some((s) => s.featured) ? skills.filter((s) => s.featured) : skills).map((s) => s.name)
   const hidden = settings?.hidden_sections ?? []
   const exploring = settings?.exploring ?? []
   // Accent comes from a DB-validated hex color; it only applies to the light theme.
   const css = (settings ? `:root[data-theme=light]{--accent:${settings.accent}}` : '') + sectionCss(fullOrder(settings?.section_order), hidden)
   const present: Record<string, boolean> = { home: true, work: projects.length > 0, about: Boolean(profile?.full_bio || profile?.avatar_url), stack: skills.length > 0, contact: true }
-  const nav = [['home', 'Home'], ['about', 'About'], ['stack', 'Skills'], ['work', 'Projects'], ['contact', 'Contact']].filter(([id]) => present[id] && !hidden.includes(id)).map(([id, label]) => ({ id, label, to: id === 'work' ? '/projects' : undefined }))
+  const nav = [['home', 'Home'], ['about', 'About'], ['stack', 'Skills'], ['work', 'Projects'], ['contact', 'Contact']].filter(([id]) => present[id] && !hidden.includes(id)).map(([id, label]) => ({ id, label }))
   const eduLine = edu[0] ? [edu[0].degree, edu[0].institution].filter(Boolean).join(', ') : ''
 
   return (
@@ -56,9 +57,10 @@ export default function Home() {
           <section className="empty"><h1>This portfolio is not set up yet</h1><p>Sign in and complete your profile to publish it.</p><Link className="btn primary" to="/login">Sign in</Link></section>
         ) : (
           <>
-            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} projects={projects} />
+            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} projects={projects} stack={stack} />
             <Statement text={profile.short_bio} />
             <div className="sections">
+              {projects.length > 0 && <Work projects={projects} />}
               {(profile.full_bio || profile.avatar_url) && <About profile={profile} education={eduLine} exploring={exploring} />}
               {skills.length > 0 && <Stack skills={skills} />}
               <Process />

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toggleTheme } from '../lib/theme'
 
-interface Props { name: string; logo?: string | null; items: { id: string; label: string; to?: string }[]; showDashboard: boolean }
+interface Props { name: string; logo?: string | null; items: { id: string; label: string }[]; showDashboard: boolean }
 
 export default function Nav({ name, logo, items, showDashboard }: Props) {
   const [active, setActive] = useState('home')
@@ -39,9 +39,7 @@ export default function Nav({ name, logo, items, showDashboard }: Props) {
       <div className="nav-in">
         <a href="#home" className="brand-link" aria-label={`${name}, home`}>{logo ? <img className="logo" src={logo} alt="" /> : name}</a>
         <nav aria-label="Main" className="nav-links">
-          {items.map((i) => i.to
-            ? <Link key={i.id} to={i.to} viewTransition>{i.label}</Link>
-            : <a key={i.id} href={`#${i.id}`} className={active === i.id ? 'active' : ''} aria-current={active === i.id ? 'true' : undefined}>{i.label}</a>)}
+          {items.map((i) => <a key={i.id} href={`#${i.id}`} className={active === i.id ? 'active' : ''} aria-current={active === i.id ? 'true' : undefined}>{i.label}</a>)}
         </nav>
         <span className="grow" />
         <button className="link" onClick={toggleTheme}>Theme</button>
@@ -50,9 +48,7 @@ export default function Nav({ name, logo, items, showDashboard }: Props) {
       </div>
       {open && (
         <div id="mobile-menu" className="menu" role="dialog" aria-modal="true" aria-label="Menu">
-          {items.map((i, n) => i.to
-            ? <Link key={i.id} to={i.to} viewTransition onClick={() => setOpen(false)}><small>{String(n + 1).padStart(2, '0')}</small>{i.label}</Link>
-            : <a key={i.id} href={`#${i.id}`} onClick={() => setOpen(false)}><small>{String(n + 1).padStart(2, '0')}</small>{i.label}</a>)}
+          {items.map((i, n) => <a key={i.id} href={`#${i.id}`} onClick={() => setOpen(false)}><small>{String(n + 1).padStart(2, '0')}</small>{i.label}</a>)}
         </div>
       )}
     </header>
