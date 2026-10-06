@@ -25,7 +25,7 @@ export default function Hero({ profile, lead, links, projects, stack }: Props) {
         </p>
         <ul className="social">
           {links.map((l) => <li key={l.id}><SocialLink name={l.platform} href={l.url} /></li>)}
-          {profile.resume_url && <li><SocialLink name="Resume" href={profile.resume_url} icon={FiFileText} /></li>}
+          {profile.resume_url && <li><SocialLink name="View CV" href={profile.resume_url} icon={FiFileText} /></li>}
         </ul>
       </div>
       {projects.length > 0 && <EngineeringMap projects={projects} stack={stack} initials={initials} />}
