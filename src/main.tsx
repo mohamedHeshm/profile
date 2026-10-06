@@ -1,38 +1,28 @@
-import { StrictMode, Suspense, lazy } from 'react'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { AuthProvider } from './features/auth/AuthContext'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import ErrorBoundary from './components/ErrorBoundary'
+import { AuthProvider } from './features/auth/AuthContext'
+import { initMagnetic } from './lib/magnetic'
 import { configured } from './lib/supabase'
+import { routes } from './routes'
 import './styles.css'
-
-const Home = lazy(() => import('./pages/Home'))
-const Login = lazy(() => import('./pages/Login'))
-const ProjectPage = lazy(() => import('./pages/ProjectPage'))
-const Projects = lazy(() => import('./pages/Projects'))
-const Dashboard = lazy(() => import('./pages/Dashboard'))
 
 try {
   const saved = localStorage.getItem('theme')
   document.documentElement.dataset.theme = saved ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
 } catch { /* storage unavailable: keep the default theme */ }
 
+initMagnetic()
+const router = configured ? createBrowserRouter(routes) : null
+
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
     <ErrorBoundary>
-      {!configured ? (
-        <main className="auth"><h1>Supabase is not configured</h1><p>Copy <code>.env.example</code> to <code>.env</code> and add your project URL and anon key.</p></main>
+      {router ? (
+        <AuthProvider><RouterProvider router={router} /></AuthProvider>
       ) : (
-        <BrowserRouter><AuthProvider><Suspense fallback={<div className="skeleton" />}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/projects/:slug" element={<ProjectPage />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="*" element={<main className="auth"><h1>Page not found</h1><a href="/">Back to site</a></main>} />
-          </Routes>
-        </Suspense></AuthProvider></BrowserRouter>
+        <main className="auth"><h1>Supabase is not configured</h1><p>Copy <code>.env.example</code> to <code>.env</code> and add your project URL and anon key.</p></main>
       )}
     </ErrorBoundary>
   </StrictMode>,

@@ -52,7 +52,7 @@ export default function ProjectPage() {
   const next = sibs.length > 1 && i >= 0 ? sibs[(i + 1) % sibs.length] : null
   return (
     <main className="wrap case-page">
-      <p><Link to="/projects" className="back">← Back to all projects</Link></p>
+      <p><Link to="/projects" className="back" viewTransition>← Back to all projects</Link></p>
       {p === undefined ? <div className="skeleton hero-skel" /> : p === null ? (
         failed
           ? <section className="empty"><h1>We couldn’t load this project</h1><p>Check your connection and try again.</p><button className="btn primary" onClick={() => setTries(tries + 1)}>Try again</button></section>
@@ -73,7 +73,7 @@ export default function ProjectPage() {
               {p.github_url && <a className="btn" href={p.github_url} target="_blank" rel="noreferrer noopener">Source code</a>}
             </p>
           </header>
-          {p.image_url && <div className="shot big"><span className="chrome" aria-hidden="true"><i /><i /><i /></span><img src={p.image_url} alt={`${p.title} screenshot`} width={1600} height={1000} decoding="async" /></div>}
+          {p.image_url && <div className="shot big" style={{ viewTransitionName: 'project-image' }}><span className="chrome" aria-hidden="true"><i /><i /><i /></span><img src={p.image_url} alt={`${p.title} screenshot`} width={1600} height={1000} decoding="async" /></div>}
           <Block title="Overview"><Text v={p.description} /></Block>
           <Block title="What problem it solves"><Text v={p.problem} /></Block>
           <Block title="Solution"><Text v={p.solutions} /></Block>
@@ -88,7 +88,7 @@ export default function ProjectPage() {
               <div className="shots">{imgs.map((g) => <button key={g.id} className="gal-btn" aria-label="Enlarge screenshot" onClick={() => setZoom(g.image_url)}><img src={g.image_url} alt={`${p.title} screenshot`} loading="lazy" decoding="async" /></button>)}</div>
             </section>
           )}
-          {next && <Link className="next" to={projectPath(next)}><span className="kicker">Next project</span><span className="display">{next.title}</span></Link>}
+          {next && <Link className="next" to={projectPath(next)} viewTransition><span className="kicker">Next project</span><span className="display">{next.title}</span></Link>}
         </article>
       )}
       {zoom && <dialog ref={dlg} className="lightbox" onClose={() => setZoom(null)} onClick={() => dlg.current?.close()}><img src={zoom} alt="Enlarged screenshot" /></dialog>}

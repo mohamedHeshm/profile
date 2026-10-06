@@ -7,6 +7,7 @@ interface Props { name: string; logo?: string | null; items: { id: string; label
 export default function Nav({ name, logo, items, showDashboard }: Props) {
   const [active, setActive] = useState('home')
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
   const key = items.map((i) => i.id).join()
 
   useEffect(() => {
@@ -18,6 +19,14 @@ export default function Nav({ name, logo, items, showDashboard }: Props) {
   }, [key]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    let raf = 0
+    const on = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => setScrolled(window.scrollY > 8)) }
+    on()
+    window.addEventListener('scroll', on, { passive: true })
+    return () => { window.removeEventListener('scroll', on); cancelAnimationFrame(raf) }
+  }, [])
+
+  useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
     if (!open) return
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
@@ -26,7 +35,7 @@ export default function Nav({ name, logo, items, showDashboard }: Props) {
   }, [open])
 
   return (
-    <header className="nav">
+    <header className={`nav${scrolled ? ' scrolled' : ''}`}>
       <div className="nav-in">
         <a href="#home" className="brand-link" aria-label={`${name}, home`}>{logo ? <img className="logo" src={logo} alt="" /> : name}</a>
         <nav aria-label="Main" className="nav-links">

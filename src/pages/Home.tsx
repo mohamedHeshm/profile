@@ -39,6 +39,7 @@ export default function Home() {
     void supabase.rpc('record_view', { p_path: '/' })
   }, [ready, session])
 
+  const stack = (skills.some((s) => s.featured) ? skills.filter((s) => s.featured) : skills).map((s) => s.name)
   const hidden = settings?.hidden_sections ?? []
   const exploring = settings?.exploring ?? []
   // Accent comes from a DB-validated hex color; it only applies to the light theme.
@@ -56,7 +57,7 @@ export default function Home() {
           <section className="empty"><h1>This portfolio is not set up yet</h1><p>Sign in and complete your profile to publish it.</p><Link className="btn primary" to="/login">Sign in</Link></section>
         ) : (
           <>
-            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} projects={projects} />
+            <Hero profile={profile} lead={settings?.hero_text || profile.short_bio} links={links} projects={projects} stack={stack} />
             <Statement text={profile.short_bio} />
             <div className="sections">
               {projects.length > 0 && <Work projects={projects} />}
