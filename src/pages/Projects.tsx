@@ -1,17 +1,25 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useProfile, useRows } from '../hooks/useRows'
+import { useProfile } from '../hooks/useRows'
+import { useProjects } from '../hooks/useProjects'
 import { setMeta } from '../lib/seo'
-import Work, { CARD_COLS, type ProjectCard } from './home/Work'
+import Work from './home/Work'
 
 export default function Projects() {
   const { profile, loading: loadingProfile } = useProfile()
-  const { rows, loading } = useRows<ProjectCard>('projects', profile?.id, true, CARD_COLS)
+  const { projects, loading, error, reload } = useProjects(profile?.id)
   useEffect(() => { setMeta({ title: `Projects${profile ? ` — ${profile.full_name}` : ''}`, description: profile?.short_bio }) }, [profile])
+
+  let body
+  if (loadingProfile || (profile && loading)) body = <div className="skeleton hero-skel" aria-busy="true" />
+  else if (error) body = <section className="empty"><h1>We couldn’t load the projects</h1><p>{error}</p><button className="btn primary" onClick={() => void reload()}>Try again</button></section>
+  else if (projects.length === 0) body = <section className="empty"><h1>No projects available.</h1><p>Published projects will appear here.</p></section>
+  else body = <Work projects={projects} />
+
   return (
     <main className="wrap case-page">
-      <p><Link to="/" className="back">← Home</Link></p>
-      {loadingProfile || (profile && loading) ? <div className="skeleton hero-skel" /> : rows.length === 0 ? <p className="empty">No projects have been published yet.</p> : <Work projects={rows} />}
+      <p><Link to="/" className="back" viewTransition>← Home</Link></p>
+      {body}
     </main>
   )
 }

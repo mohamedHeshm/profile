@@ -1,12 +1,9 @@
 import { useRef, type CSSProperties, type PointerEvent } from 'react'
 import { Link, useViewTransitionState } from 'react-router-dom'
 import { ArrowUpRight, GithubMark } from '../../components/Icons'
-import { projectPath } from '../../lib/projects'
-import type { Project } from '../../types'
+import { useReveal } from '../../hooks/useReveal'
+import { featuredFirst, projectPath, type ProjectCard } from '../../lib/projects'
 import { SectionHead } from './Sections'
-
-export type ProjectCard = Pick<Project, 'id' | 'slug' | 'title' | 'summary' | 'image_url' | 'technologies' | 'github_url' | 'live_url' | 'featured' | 'category' | 'role' | 'year'>
-export const CARD_COLS = 'id,slug,title,summary,image_url,technologies,github_url,live_url,featured,category,role,year'
 
 const clamp = (v: number) => Math.max(-0.5, Math.min(0.5, v))
 
@@ -53,7 +50,8 @@ function Card({ p, i }: { p: ProjectCard; i: number }) {
 }
 
 export default function Work({ projects }: { projects: ProjectCard[] }) {
-  const list = [...projects].sort((a, b) => Number(b.featured) - Number(a.featured))
+  const list = featuredFirst(projects)
+  useReveal(list.length) // cards start hidden (.reveal) and are shown by this hook on every page that renders them
   return (
     <section id="work" className="sec" aria-labelledby="work-title">
       <SectionHead kicker="Selected work" title="Projects" />
